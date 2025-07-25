@@ -1,0 +1,10 @@
+- name: Restart Apache
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: restarted
+
+- name: Reload Firewall
+  ansible.builtin.command:
+    cmd: firewall-cmd --reload
+  become: true
+  when: ansible_os_family == 'RedHat'

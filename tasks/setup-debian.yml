@@ -1,0 +1,14 @@
+---
+- name: "Install Apache and PHP packages on Debian/Ubuntu"
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  loop: "{{ [web_pkg_debian, php_pkgs_debian] | flatten }}"
+  notify: Restart Apache
+
+- name: Enable and start Apache service
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: started
+    enabled: true

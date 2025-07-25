@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName {{ site_domain }}
+    ServerAlias {{ site_domain }}:{{ site_port }}
+    DocumentRoot {{ wp_install_path }}
+    <Directory "{{ wp_install_path }}">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    ErrorLog {{ apache_log_dir_debian if ansible_os_family == 'Debian' else apache_log_dir_redhat }}/error.log
+    CustomLog {{ apache_log_dir_debian if ansible_os_family == 'Debian' else apache_log_dir_redhat }}/access.log combined
+</VirtualHost>

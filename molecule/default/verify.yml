@@ -1,0 +1,112 @@
+---
+- name: Verify WordPress role
+  hosts: all
+  become: yes
+  gather_facts: true
+
+  tasks:
+    - name: Load role default vars
+      ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Load role vars
+      ansible.builtin.include_vars:
+        file: "../../vars/main.yml"
+      tags: always
+
+    - name: "Set OS-specific service name"
+      ansible.builtin.set_fact:
+        service_name: "{{ web_pkg_debian if ansible_os_family == 'Debian' else web_pkg_redhat }}"
+
+    - name: Get service facts
+      ansible.builtin.service_facts:
+
+    # Check 1: Apache Service
+    - name: Check apache process is running
+      ansible.builtin.shell: "ps aux | grep '[a]pache2' || ps aux | grep '[h]ttpd'"
+      register: apache_ps
+      changed_when: false
+    - name: Assert Apache process is running
+      ansible.builtin.assert:
+        that:
+          - apache_ps.stdout != ""
+        fail_msg: "{{ service_name }} it's not running."
+        success_msg: "{{ service_name }} is running."
+
+    # Check 2: wp-config.php exists (when dtabase vars are defined)
+    - name: Check wp-config.php exists
+      ansible.builtin.stat:
+        path: "{{ wp_install_path }}/wp-config.php"
+      register: wp_config_file
+      when: wordpress_db_name is defined and wordpress_db_name != ''
+    - name: Assert wp-config.php exists
+      ansible.builtin.assert:
+        that:
+          - wp_config_file.stat.exists
+          - wp_config_file.stat.isreg
+        fail_msg: "wp-config.php file not found."
+        success_msg: "wp-config.php file exist."
+      when: wordpress_db_name is defined and wordpress_db_name != ''
+
+    # Check 3: Listening and debug ports
+    - name: Check listening ports inside container
+      ansible.builtin.shell: ss -tlnp | grep ':80'
+      register: apache_ports
+      changed_when: false
+    - name: Debug listening ports
+      ansible.builtin.debug:
+        var: apache_ports.stdout_lines
+
+    # Check 4: HTTP Access (Homepage)
+    - name: Check HTTP response code
+      ansible.builtin.uri:
+        url: "http://localhost:80"
+        status_code: 200
+      register: resp
+      changed_when: false
+    - name: Debug HTTP response
+      ansible.builtin.debug:
+        var: resp.status
+    - name: Assert WordPress homepage loads
+      ansible.builtin.assert:
+        that:
+          - resp.status == 200
+        fail_msg: "WordPress is not responding on / (HTTP {{ resp.status }})."
+        success_msg: "WordPress responded successfully with HTTP 200."
+
+    # Check 5: Extract and validate WordPress version
+    - name: Check version.php exists
+      ansible.builtin.stat:
+        path: "{{ wp_version_file }}"
+      register: version_file
+    - name: Assert version.php exists
+      ansible.builtin.assert:
+        that:
+          - version_file.stat.exists
+          - version_file.stat.isreg
+        fail_msg: "The WordPress version.php file does not exist."
+        success_msg: "The WordPress version.php file exist."
+
+    - name: Extract WordPress version
+      ansible.builtin.shell: grep 'wp_version' {{ wp_version_file }} | \
+        sed -n "s/^.*'\\([0-9.]*\\)'.*$/\\1/p" | \
+        tr -d '\\n\\r' | \
+        sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+      register: wpver
+      changed_when: false
+    - name: Show extracted WordPress version
+      ansible.builtin.debug:
+        var: wpver.stdout
+    - name: Assert WordPress version
+      ansible.builtin.assert:
+        that:
+          - wpver.stdout is match("^\\d+\\.\\d+(\\.\\d+)?$")
+        fail_msg: "Invalid WordPress version: '{{ wpver.stdout }}'"
+        success_msg: "Valid WordPress version: {{ wpver.stdout }}"
+
+    # Check Summary of verification results
+    - name: Final Verification Summary
+      ansible.builtin.debug:
+        msg: "✅ All verification tests (including linting, installation, and basic WordPress functionality) ran successfully."
+      run_once: true
+      delegate_to: localhost

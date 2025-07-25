@@ -1,0 +1,15 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: "Include and run the role"
+      ansible.builtin.import_role:
+        name: "../../../{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+
+    - name: Check uname
+      ansible.builtin.raw: uname -a
+      register: result
+      changed_when: false

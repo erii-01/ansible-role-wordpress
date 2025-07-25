@@ -1,0 +1,52 @@
+# debian/ubuntu packages
+web_pkg_debian: "apache2"
+php_pkgs_debian:
+  - php
+  - libapache2-mod-php
+  - php-mysql
+  - php-gd
+  - php-curl
+  - php-mbstring
+  - php-xml
+  - php-intl
+  - php-zip
+  - unzip
+  - wget
+
+# redhat/rocky packages
+web_pkg_redhat: "httpd"
+php_pkgs_redhat:
+  - php
+  - php-mysqlnd
+  - php-json
+  - php-curl
+  - php-gd
+  - php-mbstring
+  - php-xml
+  - php-intl
+  - php-zip
+  - unzip
+  - wget
+  - python3-firewall
+  - firewalld
+  - dbus
+  - php-fpm
+
+web_service_name: "{{ web_pkg_debian if ansible_os_family == 'Debian' else web_pkg_redhat }}"
+
+# vars file for ansible-role-wordpress
+wp_version: "6.8"
+wp_checksum_sha256: "sha256:f7dbedc423ddb3f2f3e98e9140f1720bfd6d4a8f4873c85da2e62f6a078de10a"
+wp_base_path: "/var/www/html"
+wp_install_path: "/var/www/html/wordpress.local"
+wp_version_file: "{{ wp_install_path }}/wp-includes/version.php"
+site_domain: "wordpress.local"
+site_port: "8081"
+
+# Vars for Apache configuration rules
+apache_conf_path_debian: "/etc/apache2/sites-available"
+apache_conf_path_redhat: "/etc/httpd/conf.d"
+
+# Vars for the Apache logs directory
+apache_log_dir_debian: "${APACHE_LOG_DIR}"
+apache_log_dir_redhat: "/var/log/httpd"

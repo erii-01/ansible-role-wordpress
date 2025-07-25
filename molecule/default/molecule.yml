@@ -1,0 +1,19 @@
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml
+
+platforms:
+  - name: molecule-test
+    image: "geerlingguy/docker-rockylinux9-ansible:latest"
+    #image: "geerlingguy/docker-ubuntu2204-ansible:latest"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    published_ports:
+      - "8081:80"
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
