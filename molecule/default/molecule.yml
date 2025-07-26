@@ -4,8 +4,7 @@ dependency:
     requirements-file: requirements.yml
 
 platforms:
-  - name: molecule-test
-    #image: "geerlingguy/docker-rockylinux9-ansible:latest"
+  - name: ubuntu-test
     image: "geerlingguy/docker-ubuntu2204-ansible:latest"
     privileged: true
     volumes:
@@ -13,11 +12,23 @@ platforms:
     published_ports:
       - "8081:80"
 
+  - name: rocky-test
+    image: "geerlingguy/docker-rockylinux9-ansible:latest"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    published_ports:
+      - "8082:80"
+
 provisioner:
   name: ansible
   lint:
     name: ansible-lint
   inventory:
     host_vars:
-      molecule-test:
+      ubuntu-test:
         ansible_python_interpreter: /usr/bin/python3
+        site_port: "8081"
+      rocky-test:
+        ansible_python_interpreter: /usr/bin/python3
+        site_port: "8082"
