@@ -5,8 +5,8 @@ dependency:
 
 platforms:
   - name: molecule-test
-    image: "geerlingguy/docker-rockylinux9-ansible:latest"
-    #image: "geerlingguy/docker-ubuntu2204-ansible:latest"
+    #image: "geerlingguy/docker-rockylinux9-ansible:latest"
+    image: "geerlingguy/docker-ubuntu2204-ansible:latest"
     privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -17,3 +17,7 @@ provisioner:
   name: ansible
   lint:
     name: ansible-lint
+  inventory:
+    host_vars:
+      molecule-test:
+        ansible_python_interpreter: /usr/bin/python3
