@@ -104,4 +104,3 @@
     owner: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
     group: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
   become: true
-  notify: Restart httpd

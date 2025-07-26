@@ -9,11 +9,6 @@
       ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Load role vars
-      ansible.builtin.include_vars:
-        file: "../../vars/main.yml"
-      tags: always
-
     - name: "Set OS-specific service name"
       ansible.builtin.set_fact:
         service_name: "{{ web_pkg_debian if ansible_os_family == 'Debian' else web_pkg_redhat }}"

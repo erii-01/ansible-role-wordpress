@@ -1,21 +1,21 @@
 ---
 - name: "Install httpd and PHP packages on RedHat family"
   ansible.builtin.dnf:
-    name: "{{ [web_pkg_redhat] + php_pkgs_redhat + ['python3-libsemanage'] }}"
+    name: "{{ item }}"
     state: present
-  become: true
-  notify: Restart Apache
+    update_cache: true
+  loop: "{{ [web_pkg_redhat, php_pkgs_redhat] | flatten }}"
 
 - name: Open HTTP and HTTPS ports in firewalld
   ansible.posix.firewalld:
     service: "{{ item }}"
+    permanent: yes
     permanent: yes
     state: enabled
   loop:
     - http
     - https
   become: true
-  notify: Reload Firewall
 
 - name: "Allow Apache to connect to database (SELinux)"
   ansible.posix.seboolean:
@@ -24,3 +24,10 @@
     persistent: yes
   become: true
   when: ansible_selinux.status == 'enabled'
+
+- name: Enable and start httpd service
+  ansible.builtin.service:
+    name: "{{ web_service_name }}"
+    state: started
+    enabled: true
+  when: ansible_facts['systemd'] is defined

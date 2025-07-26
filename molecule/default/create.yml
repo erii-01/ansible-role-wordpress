@@ -15,7 +15,7 @@
         privileged: "{{ item.privileged | default(false) }}"
         volumes: "{{ item.volumes | default([]) }}"
         published_ports: "{{ item.published_ports | default([]) }}"
-        command: sleep 1d
+        command: sleep infinity
         log_driver: json-file
         docker_host: "{{ lookup('env', 'DOCKER_HOST') }}"
       register: result

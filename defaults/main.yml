@@ -16,6 +16,7 @@ php_pkgs_debian:
 # redhat/rocky packages
 web_pkg_redhat: "httpd"
 php_pkgs_redhat:
+  - python3-libsemanage
   - php
   - php-mysqlnd
   - php-json
