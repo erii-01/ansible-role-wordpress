@@ -55,11 +55,11 @@
   ansible.builtin.template:
     src: virtualhost.conf.j2
     dest: "{{ apache_conf_path_debian if ansible_os_family == 'Debian' else apache_conf_path_redhat }}/wordpress.conf"
-    owner: root
-    group: root
-    mode: "0644"
+    mode: "0744"
   become: true
-  notify: Restart Apache
+  notify:
+    - Restart Apache
+    - Restart httpd
 
 - name: Ensure WordPress Virtual Host symlink is enabled
   ansible.builtin.file:
@@ -94,7 +94,7 @@
     backrefs: yes
   become: true
   when: ansible_os_family == 'RedHat'
-  notify: Restart Apache
+  notify: Restart httpd
 
 - name: Ensure correct ownership and permissions for the entire web root
   ansible.builtin.file:

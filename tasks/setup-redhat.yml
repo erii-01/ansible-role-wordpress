@@ -1,10 +1,27 @@
 ---
-- name: "Install httpd and PHP packages on RedHat family"
+- name: Install httpd and PHP packages on RedHat family
   ansible.builtin.dnf:
     name: "{{ item }}"
     state: present
     update_cache: true
   loop: "{{ [web_pkg_redhat, php_pkgs_redhat] | flatten }}"
+
+- name: Ensure /run/php-fpm directory exists with correct permissions
+  ansible.builtin.file:
+    path: /run/php-fpm/
+    state: directory
+    owner: apache
+    group: apache
+    mode: '0755'
+  become: true
+
+- name: Start PHP-FPM service
+  ansible.builtin.command: "/usr/sbin/php-fpm -F"
+  args:
+    creates: /run/php-fpm/www.sock
+  async: 60
+  poll: 0
+  become: true
 
 - name: Open HTTP and HTTPS ports in firewalld
   ansible.posix.firewalld:
@@ -17,7 +34,7 @@
     - https
   become: true
 
-- name: "Allow Apache to connect to database (SELinux)"
+- name: Allow Apache to connect to database (SELinux)
   ansible.posix.seboolean:
     name: httpd_can_network_connect_db
     state: yes
@@ -25,9 +42,14 @@
   become: true
   when: ansible_selinux.status == 'enabled'
 
-- name: Enable and start httpd service
-  ansible.builtin.service:
-    name: "{{ web_service_name }}"
-    state: started
-    enabled: true
-  when: ansible_facts['systemd'] is defined
+- name: Ensure /var/run/httpd exists
+  ansible.builtin.file:
+    path: /var/run/httpd
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Stop httpd if running
+  ansible.builtin.shell: "killall httpd || true"
+  become: true
+  ignore_errors: true

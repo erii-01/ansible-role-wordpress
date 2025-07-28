@@ -3,3 +3,12 @@
     name: "{{ web_service_name }}"
     state: restarted
   when: ansible_os_family == 'Debian'
+
+- name: Restart httpd
+  ansible.builtin.shell: "nohup /usr/sbin/httpd -D FOREGROUND -e debug &"
+  args:
+    chdir: /var/run/httpd
+  async: 60
+  poll: 0
+  become: true
+  when: ansible_os_family == 'RedHat'

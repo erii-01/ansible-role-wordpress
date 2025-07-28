@@ -6,65 +6,84 @@ on:
     branches:
       - main
     paths:
-      - 'defaults/**'
-      - 'handlers/**'
-      - 'meta/**'
-      - 'molecule/**'
-      - 'tasks/**'
-      - 'templates/**'
-      - 'ansible.cfg'
-      - 'requirements.yml'
-      - '!LICENSE'
-      - '!*.md'    
-    
+      - "defaults/**"
+      - "handlers/**"
+      - "meta/**"
+      - "molecule/**"
+      - "tasks/**"
+      - "templates/**"
+      - "ansible.cfg"
+      - "requirements.yml"
+      - "!LICENSE"
+      - "!*.md"
+
   pull_request:
     branches:
       - main
     paths:
-      - 'defaults/**'
-      - 'handlers/**'
-      - 'meta/**'
-      - 'molecule/**'
-      - 'tasks/**'
-      - 'templates/**'
-      - 'ansible.cfg'
-      - 'requirements.yml'
-      - '!LICENSE'
-      - '!*.md'   
-      
+      - "defaults/**"
+      - "handlers/**"
+      - "meta/**"
+      - "molecule/**"
+      - "tasks/**"
+      - "templates/**"
+      - "ansible.cfg"
+      - "requirements.yml"
+      - "!LICENSE"
+      - "!*.md"
+
 jobs:
-  test:
-    name: Molecule Test on Ubuntu and RedHat"
+  lint:
+    name: Lint Ansible Role
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write 
-      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache: "pip"
+
+      - name: Install ansible-lint
+        run: |
+          pip install --upgrade pip
+          pip install ansible-lint
+
+      - name: Run ansible-lint
+        run: |
+          echo "Running ansible-lint..."
+          ansible-lint .
+
+  test:
+    name: Molecule Test
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false 
+      fail-fast: false
       matrix:
         distro_label:
           - "Ubuntu Webserver"
-          - "RedHat Webserver"
-  
+          - "Rocky Webserver"
+
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v4
 
       - name: Check Docker daemon status
         run: docker info > /dev/null 2>&1 || { echo "Docker daemon is not running!"; exit 1; }
-        
+
       - name: Set up Python 3.
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
-          cache: 'pip'
-  
+          python-version: "3.x"
+          cache: "pip"
+
       - name: Install test dependencies.
-        run:  |
+        run: |
           pip install --upgrade pip
           pip install ansible-core==2.15.5
-          pip install molecule 'molecule-plugins[docker]' ansible-lint
-  
+          pip install molecule 'molecule-plugins[docker]'
+
       - name: Run Molecule tests.
         run: molecule test
