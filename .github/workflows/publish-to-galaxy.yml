@@ -2,16 +2,16 @@ name: Publicar role a Ansible Galaxy
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-  
+
     permissions:
       contents: read
       id-token: write
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,13 +19,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.x"
 
       - name: Install Ansible Core
         run: pip install ansible-core
 
       - name: Run Ansible Galaxy Publisher Action
-        uses: ansible-community/ansible-galaxy-action@v1
-        with:
-          api_key: ${{ secrets.ANSIBLE_GALAXY_TOKEN }}
-          commit_message: "Publicación automática de la versión ${{ github.ref_name }}"
+        run: >-
+          ansible-galaxy role import --api-key ${{ secrets.ANSIBLE_GALAXY_TOKEN }}
+          $(echo ${{ github.repository }} | cut -d/ -f1) $(echo ${{ github.repository }} | cut -d/ -f2)
