@@ -16,14 +16,6 @@
     - name: Get service facts
       ansible.builtin.service_facts:
 
-    - name: Wait for apache/httpd to start
-      ansible.builtin.wait_for:
-        port: 80
-        host: 127.0.0.1
-        delay: 3
-        timeout: 30
-        state: started
-
     # Check 1: Apache Service
     - name: Check apache/httpd process is running
       ansible.builtin.shell: "ps aux | grep '[a]pache2' || ps aux | grep '[h]ttpd'"
