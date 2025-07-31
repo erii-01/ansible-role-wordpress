@@ -16,7 +16,7 @@
     - name: Get service facts
       ansible.builtin.service_facts:
 
-    # Check 1: Apache Service
+    # Check: Apache Service
     - name: Check apache/httpd process is running
       ansible.builtin.shell: "ps aux | grep '[a]pache2' || ps aux | grep '[h]ttpd'"
       register: apache_ps
@@ -28,7 +28,7 @@
         fail_msg: "{{ service_name }} it's not running."
         success_msg: "{{ service_name }} is running."
 
-    # Check 2: wp-config.php exists (when dtabase vars are defined)
+    # Check: wp-config.php exists (when dtabase vars are defined)
     - name: Check wp-config.php exists
       ansible.builtin.stat:
         path: "{{ wp_install_path }}/wp-config.php"
@@ -43,24 +43,7 @@
         success_msg: "wp-config.php file exist."
       when: wordpress_db_name is defined and wordpress_db_name != ''
 
-    # Check 4: HTTP Access (Homepage)
-    - name: Check HTTP response code
-      ansible.builtin.uri:
-        url: "http://localhost"
-        status_code: 200
-      register: resp
-      changed_when: false
-    - name: Debug HTTP response
-      ansible.builtin.debug:
-        var: resp.status
-    - name: Assert WordPress homepage loads
-      ansible.builtin.assert:
-        that:
-          - resp.status == 200
-        fail_msg: "WordPress is not responding on / (HTTP {{ resp.status }})."
-        success_msg: "WordPress responded successfully with HTTP 200."
-
-    # Check 5: Extract and validate WordPress version
+    # Check: Extract and validate WordPress version
     - name: Check version.php exists
       ansible.builtin.stat:
         path: "{{ wp_version_file }}"

@@ -21,19 +21,6 @@ provisioner:
   name: ansible
   lint:
     name: ansible-lint
-  # inventory:
-  #   host_vars:
-  #     ubuntu-test:
-  #       ansible_python_interpreter: /usr/bin/python3
-  #       site_port: "8081"
-  #     rocky-test:
-  #       ansible_python_interpreter: /usr/bin/python3
-  #       site_port: "8082"
-  #   #----------------------
-  #   group_vars:
-  #     all:
-  #       ansible_user: root
-  #       ansible_become: false
-  #   #----------------------
+
 verifier:
   name: ansible
