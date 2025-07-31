@@ -46,7 +46,7 @@
     # Check 4: HTTP Access (Homepage)
     - name: Check HTTP response code
       ansible.builtin.uri:
-        url: "http://localhost:80"
+        url: "http://localhost"
         status_code: 200
       register: resp
       changed_when: false
