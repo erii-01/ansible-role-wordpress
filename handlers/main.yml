@@ -12,3 +12,4 @@
   poll: 0
   become: true
   when: ansible_os_family == 'RedHat'
+  changed_when: false

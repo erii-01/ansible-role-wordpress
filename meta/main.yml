@@ -7,14 +7,14 @@ galaxy_info:
   namespace: erii-01
   role_name: ansible_role_wordpress
 
-  min_ansible_version: 2.1
+  min_ansible_version: "2.1"
   platforms:
     - name: Ubuntu
       versions:
-        - "22.04"
-    - name: EL (Enterprise Linux)
+        - "jammy" # Ubuntu 22.04
+    - name: Rocky
       versions:
-        - "9" # Rocky Linux
+        - "all" # Rocky Linux 9
 
   galaxy_tags:
     - wordpress

@@ -12,44 +12,35 @@
     state: directory
     owner: apache
     group: apache
-    mode: '0755'
-  become: true
+    mode: "0755"
 
 - name: Start PHP-FPM service
-  ansible.builtin.command: "/usr/sbin/php-fpm -F"
+  ansible.builtin.command: /usr/sbin/php-fpm
   args:
     creates: /run/php-fpm/www.sock
-  async: 60
-  poll: 0
-  become: true
 
 - name: Open HTTP and HTTPS ports in firewalld
   ansible.posix.firewalld:
     service: "{{ item }}"
-    permanent: yes
-    permanent: yes
+    permanent: true
     state: enabled
   loop:
     - http
     - https
-  become: true
 
 - name: Allow Apache to connect to database (SELinux)
   ansible.posix.seboolean:
     name: httpd_can_network_connect_db
-    state: yes
-    persistent: yes
-  become: true
+    state: true
+    persistent: true
   when: ansible_selinux.status == 'enabled'
 
 - name: Ensure /var/run/httpd exists
   ansible.builtin.file:
     path: /var/run/httpd
     state: directory
-    mode: '0755'
-  become: true
+    mode: "0755"
 
 - name: Stop httpd if running
   ansible.builtin.shell: "killall httpd || true"
-  become: true
-  ignore_errors: true
+  changed_when: false

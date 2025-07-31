@@ -1,1 +1,3 @@
 ansible~=11.0
+ansible-dev-tools~=25.5
+molecule-plugins

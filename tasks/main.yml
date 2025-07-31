@@ -14,7 +14,6 @@
     owner: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
     group: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
     mode: "0755"
-  become: true
 
 - name: Download WordPress
   ansible.builtin.get_url:
@@ -22,17 +21,15 @@
     dest: "/tmp/wordpress-{{ wp_version }}.tar.gz"
     checksum: "{{ wp_checksum_sha256 }}"
     mode: "0644"
-  become: true
 
-- name: Extract WordPress-{{ wp_version }}.tar.gz
+- name: Extract WordPress
   ansible.builtin.unarchive:
     src: "/tmp/wordpress-{{ wp_version }}.tar.gz"
     dest: "{{ wp_install_path }}"
-    remote_src: yes
+    remote_src: true
     extra_opts: [--strip-components=1]
     owner: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
     group: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
-  become: true
 
 - name: Delete unused directories and files
   ansible.builtin.file:
@@ -48,7 +45,6 @@
     owner: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
     group: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
     mode: "0644"
-  become: true
   when: wordpress_db_name is defined and wordpress_db_name != ''
 
 - name: Create Apache Virtual Host config for WordPress from template virtualhost.conf.j2
@@ -56,7 +52,6 @@
     src: virtualhost.conf.j2
     dest: "{{ apache_conf_path_debian if ansible_os_family == 'Debian' else apache_conf_path_redhat }}/wordpress.conf"
     mode: "0744"
-  become: true
   notify:
     - Restart Apache
     - Restart httpd
@@ -66,7 +61,6 @@
     src: /etc/apache2/sites-available/wordpress.conf
     dest: /etc/apache2/sites-enabled/wordpress.conf
     state: link
-  become: true
   when: ansible_os_family == 'Debian'
   notify: Restart Apache
 
@@ -74,15 +68,13 @@
   ansible.builtin.file:
     dest: /etc/apache2/sites-enabled/000-default.conf
     state: absent
-  become: true
   when: ansible_os_family == 'Debian'
   notify: Restart Apache
 
 - name: Enable Apache rewrite module
-  ansible.builtin.apache2_module:
+  community.general.apache2_module:
     state: present
     name: rewrite
-  become: true
   when: ansible_os_family == 'Debian'
   notify: Restart Apache
 
@@ -91,8 +83,7 @@
     path: /etc/httpd/conf.modules.d/00-base.conf
     regexp: '^(#\s*)?(LoadModule\s+rewrite_module\s+modules/mod_rewrite.so)'
     line: '\2'
-    backrefs: yes
-  become: true
+    backrefs: true
   when: ansible_os_family == 'RedHat'
   notify: Restart httpd
 
@@ -100,7 +91,6 @@
   ansible.builtin.file:
     path: "{{ wp_install_path }}"
     state: directory
-    recurse: yes
+    recurse: true
     owner: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
     group: "{{ 'www-data' if ansible_os_family == 'Debian' else 'apache' }}"
-  become: true
