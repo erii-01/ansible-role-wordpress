@@ -61,9 +61,9 @@ Es necesario contar con un servidor de base de datos configurado con `db_name`, 
 | `site_domain`     | `"wordpress.local"`               | Dominio para el VirtualHost de Apache.      |
 | `site_port`       | `"8081"`                          | Puerto del `host` para el `ServerAlias`.    |
 | `wp_install_path` | `"/var/www/html/wordpress.local"` | Ruta de instalación de WordPress.           |
-| `db_name`         | `"wordpress"`                     | Nombre de la base de datos de WordPress.    |
-| `db_user`         | `"wordpress"`                     | Usuario de la base de datos.                |
-| `db_password`     | `"wordpress"`                     | Contraseña del usuario de la base de datos. |
+| `db_name`         | `"wordpress_db"`                  | Nombre de la base de datos de WordPress.    |
+| `db_user`         | `"wordpress_user"`                | Usuario de la base de datos.                |
+| `db_password`     | `"Pass12345"`                     | Contraseña del usuario de la base de datos. |
 | `db_host`         | `"localhost"`                     | Host de la base de datos.                   |
 
 ## Example Playbook
