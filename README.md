@@ -1,3 +1,5 @@
+[![Ansible Role Test with Molecule](https://github.com/erii-01/ansible-role-wordpress/actions/workflows/molecule.yml/badge.svg)](https://github.com/erii-01/ansible-role-wordpress/actions/workflows/molecule.yml)
+
 # Rol de Ansible: WordPress
 
 Un rol de Ansible para instalar y configurar un servidor web completo con WordPress y Apache. Es compatible con distribuciones de las familias Debian (Ubuntu) y Red Hat (Rocky Linux) y está probado con Molecule.
