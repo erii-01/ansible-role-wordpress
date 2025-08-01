@@ -8,6 +8,8 @@ Un rol de Ansible para instalar y configurar un servidor web completo con WordPr
 - Configura un Virtual Host para el sitio de WordPress.
 - Multi-distribución: Lógica adaptativa para Debian/Ubuntu y RHEL/Rocky.
 - Idempotente: Se puede ejecutar múltiples veces de forma segura.
+- Genera el archivo `wp-config.php` con la configuración de la base de datos.
+  > Para generar el wp-config.php se deben declarar las variables de la base de datos, tal como se indica en [Requerimientos](#requerimientos).
 
 ## Requisitos
 
@@ -48,15 +50,21 @@ Permitir a direnv activar el entorno:
 direnv allow
 ```
 
+## Requerimientos
+
+Es necesario contar con un servidor de base de datos configurado con `db_name`, `db_user`, `db_password` y `db_host` accesibles para esta instancia de WordPress. Puede configurarlo en la misma máquina (por ejemplo, usando otro rol de Ansible como [geerlingguy.mysql](https://galaxy.ansible.com/geerlingguy/mysql/)), pero también puede ser una base de datos existente en otro host.
+
 ## Variables del Rol
 
-Estas son las variables principales que se pueden modificar (ver `defaults/main.yml` para la lista completa):
-| Variable | Descripción | Valor por Defecto |
-| :---------------- | :----------------------------------------- | :------------------------------- |
-| `wp_version` | La versión de WordPress a instalar. | `"6.5.5"` |
-| `wp_install_path` | Ruta de instalación de WordPress. | `"/var/www/html/wordpress.local"`|
-| `site_domain` | Dominio para el VirtualHost de Apache. | `"wordpress.local"` |
-| `site_port` | Puerto del `host` para el `ServerAlias`. | `"8081"` |
+| Variable          | Default                           | Comments                                    |
+| :---------------- | :-------------------------------- | ------------------------------------------- |
+| `site_domain`     | `"wordpress.local"`               | Dominio para el VirtualHost de Apache.      |
+| `site_port`       | `"8081"`                          | Puerto del `host` para el `ServerAlias`.    |
+| `wp_install_path` | `"/var/www/html/wordpress.local"` | Ruta de instalación de WordPress.           |
+| `db_name`         | `"wordpress"`                     | Nombre de la base de datos de WordPress.    |
+| `db_user`         | `"wordpress"`                     | Usuario de la base de datos.                |
+| `db_password`     | `"wordpress"`                     | Contraseña del usuario de la base de datos. |
+| `db_host`         | `"localhost"`                     | Host de la base de datos.                   |
 
 ## Example Playbook
 
@@ -66,7 +74,7 @@ Including an example of how to use your role (for instance, with variables passe
 - hosts: webservers
   become: true
   roles:
-    - role: erii-01.ansible_role_wordpress
+    - role: erii-01.wordpress
 ```
 
 ## Pruebas
