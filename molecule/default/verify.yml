@@ -33,7 +33,7 @@
       ansible.builtin.stat:
         path: "{{ wp_install_path }}/wp-config.php"
       register: wp_config_file
-      when: wordpress_db_name is defined and wordpress_db_name != ''
+      when: db_name is defined and db_name != ''
     - name: Assert wp-config.php exists
       ansible.builtin.assert:
         that:
@@ -41,7 +41,7 @@
           - wp_config_file.stat.isreg
         fail_msg: "wp-config.php file not found."
         success_msg: "wp-config.php file exist."
-      when: wordpress_db_name is defined and wordpress_db_name != ''
+      when: db_name is defined and db_name != ''
 
     # Check: Extract and validate WordPress version
     - name: Check version.php exists

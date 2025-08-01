@@ -5,7 +5,7 @@ galaxy_info:
   license: MIT License
 
   namespace: erii-01
-  role_name: ansible_role_wordpress
+  role_name: wordpress
 
   min_ansible_version: "2.1"
   platforms:
